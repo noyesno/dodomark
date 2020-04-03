@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>DodoMark - Write Your Simple Self</title>
+<meta name="description" content="DodoMark is a markdown editor just works, for simplicity and allow inline CSS style.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css"/>
+<style>
+body {
+  padding:0;
+  margin:0;
+  height:100vh;
+  border:1px solid silver;
+  box-sizing:border-box;
+  padding:0 1em 0em 1em;
+  display: flex;
+  flex-flow: column;
+}
+
+body > header {
+  flex:0 0;
+  display:none;
+}
+
+body > main {
+  flex:1 1;
+}
+
+.mark2wechat {
+  display: flex;
+  height:60vh;
+}
+
+#markedit {
+  box-sizing:border-box;
+  flex:1 1 50%;
+  padding:0;
+  display:flex;
+  flex-flow:column;
+  position:relative;
+}
+
+.markedit-mark,
+.markedit-style {
+  flex:1 1;
+  display:none;
+  flex-flow:column;
+}
+
+.markedit-style.active,
+.markedit-mark.active {
+  display:flex;
+}
+
+#markedit-mark,
+#markedit-style {
+  flex:1 1;
+  padding:1em;
+  background-color:#333;
+  color:wheat;
+  border:1px solid silver;
+  border-width: 0 0px 0 0;
+  resize: none;
+}
+
+.mark2wechat iframe {
+  flex:1 1 50%;
+  border:0;
+  padding:0 1em;
+  box-sizing:border-box;
+}
+
+#markedit nav {
+  position: absolute;
+  right:0;
+  padding-right:1rem;
+  line-height: 3.0rem;
+}
+
+#markedit nav a {
+  color:lightseagreen;
+  font-size:1.6rem;
+  display: inline-block;
+  margin-right: 1rem;
+}
+
+#markedit nav a:hover {
+  color:coral;
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Mark 2 Wechat</h1>
+</header>
+
+<main class="mark2wechat">
+  <iframe id="markpage" srcdoc=""></iframe>
+  <section id="markedit">
+    <nav>
+     <a href="#" onclick="toggle_markdown();return false"><i class="fa fa-eye"></i></a>
+     <a href="#" onclick="toggle_css();return false"><i class="fa fa-paint-brush"></i></a>
+     <a href="#" onclick="toggle_help();return false"><i class="fa fa-question"></i></a>
+    </nav>
+  <div class="markedit-mark active">
+    <textarea id="markedit-mark" autocomplete="off">
+## Fossil Text
+
+使用纯文本格式来进行写作有很多好处：
+
+  1. 把注意力集中在内容上，而不是格式调整上。
+  2. 纯文本文件几乎没有对外部程序的依赖。
+  3. 纯文本文件占用的存储空间相对较少。
+
+
+## Markdown
+
+Markdown 是目前比较流行的一种文本写作格式。
+
+  1. 相对轻量的语法格式
+  2. 语法设计兼有排版的考虑 —— 纯文本格式下也便于阅读
+
+
+
+
+    </textarea>
+  </div>
+  <div class="markedit-style">
+    <textarea id="markedit-style">
+body {
+    margin: 1em auto;
+    max-width: 98%;
+    padding:0em 1em;
+}
+
+header, footer {
+  display:none;
+}
+
+article p {
+  font-family: "Microsoft Yahei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  color: #333;
+  line-height:1.6;
+  margin: 1.6em 0;
+}
+
+article h1 {
+    color:skyblue;
+    color:powderblue;
+    color: cadetblue;
+
+    font-size: 2.0em;
+    border-bottom: 1px solid powderblue;
+    line-height: 1.5;
+}
+
+article h2:before { content:"## "; }
+
+article h2 {
+    line-height:2;
+    font-size:1.3em;
+    margin-top:1em;
+    margin-bottom:0.6em;
+    color: teal;
+    background-color:transparent;
+    font-weight:bold;
+}
+
+article h3 {
+  font-size: 1.2em;
+  font-weight:bold;
+  margin-top:1em;
+  margin-bottom:1em;
+  padding-left:0px;
+  border-left:0px solid #39c;
+  color: #333;
+}
+
+article ul {
+  list-style-type: square;
+  line-height:1.6;
+}
+
+article ol {
+  list-style-type: number;
+  line-height:1.6;
+}
+
+article hr {
+  margin:1em 0;
+}
+
+article strong {
+  color: cadetblue;
+}
+
+
+article pre > code {
+    font-family: consolas, "Courier New", monospace;
+    background-color: aliceblue;
+    margin-left:1em;
+    border:0;
+    border-radius:0;
+    padding:1em;
+    display:block;
+}
+
+article code {
+    font-family:monospace, "Courier New";
+    border:0;
+    background-color:#f3f3f3;
+    border-radius:0;
+}
+
+
+article blockquote {
+    border-left: 4px solid teal;
+    background-color: #f9f9ff;
+    padding: 1em;
+    margin: 1em 2em;
+}
+    </textarea>
+   </div>
+  </section>
+</main>
+
+<template id="help-mark">
+## Markdown Syntax
+
+### Header
+
+    ## Header 2
+    
+    ## Header 3
+
+### Paragraph
+
+Paragraph is separated by blank lines.
+
+### Code
+
+    ```
+    code block line 1
+    code block line 2
+    ```  
+
+### List
+
+    * unordered list item 1
+    * unordered list item 2
+
+    1. ordered list item 1
+    2. ordered list item 2
+
+</template>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+  var markedit  = document.getElementById("markedit-mark");
+  var markstyle = document.getElementById("markedit-style");
+  var markpage  = document.getElementById("markpage");
+
+  function render_marktext(marktext, markcss){
+    if(!markcss){
+      markcss   = markstyle.value.trim();
+    }
+    if(!marktext){
+      marktext  = markedit.value.trim();
+    }
+
+    // markpage.srcdoc = "";
+    var markdoc = markpage.contentDocument;
+    var style = markdoc.createElement("style")
+    var article = markdoc.createElement("article")
+
+    style.textContent = markcss;
+    article.innerHTML = marked(marktext);
+
+    var s = markdoc.querySelector("style");
+    if(s) s.parentElement.removeChild(s);
+
+    var a = markdoc.querySelector("article");
+    if(a) a.parentElement.removeChild(a);
+
+    markdoc.head.appendChild(style);
+    markdoc.body.appendChild(article);
+    
+    // markpage.srcdoc = "<head><style>"+markstyle+"</style>""<article>" + marked(marktext) + "</article>";
+  }
+
+  var marktext = markedit.value.trim();
+  render_marktext();
+
+  markedit.addEventListener('keyup', function(evt){
+    // console.log("input", evt.key, evt.code, evt);
+    if(evt.key=="Enter"){
+      render_marktext();
+    }
+  });
+
+  markedit.addEventListener('change', function(){
+    console.log("change", this);
+    render_marktext();
+  });
+
+
+function toggle_css(){
+  document.querySelector(".markedit-mark").classList.remove("active");
+  document.querySelector(".markedit-style").classList.add("active");
+}
+
+function toggle_markdown(){
+  document.querySelector(".markedit-mark").classList.add("active");
+  document.querySelector(".markedit-style").classList.remove("active");
+  render_marktext();
+}
+
+function toggle_help(){
+  var marktext = document.getElementById("help-mark").innerHTML;
+  render_marktext(marktext);
+}
+</script>
+</body>
+</html>
