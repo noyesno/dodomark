@@ -226,7 +226,7 @@ article blockquote {
   </section>
 </main>
 
-<template id="help-mark">
+<script type="text/markdown" id="help-mark">
 ## Markdown Syntax
 
 ### Header
@@ -254,7 +254,7 @@ Paragraph is separated by blank lines.
     1. ordered list item 1
     2. ordered list item 2
 
-</template>
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
@@ -318,7 +318,7 @@ function toggle_markdown(){
 }
 
 function toggle_help(){
-  var marktext = document.getElementById("help-mark").innerHTML;
+  var marktext = document.getElementById("help-mark").text;
   render_marktext(marktext);
 }
 </script>
