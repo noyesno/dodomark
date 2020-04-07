@@ -127,19 +127,21 @@ nav > a:hover {
   <iframe id="markpage" srcdoc=""></iframe>
   <section id="markedit">
     <nav>
-     <a href="#" onclick="toggle_markdown();return false"
+     <a href="#" onclick="dodomark.toggle_markdown();return false"
         title="Markdown / Preview"><i class="fa fa-eye"></i></a>
-     <a href="#" onclick="toggle_css();return false"
+     <a href="#" onclick="dodomark.toggle_css();return false"
         title="CSS Style"><i class="fa fa-paint-brush"></i></a>
-     <a href="#" onclick="toggle_help();return false"
+     <a href="#" onclick="dodomark.toggle_help();return false"
         title="Help"><i class="fa fa-question"></i></a>
-     <a href="#" onclick="toggle_home();return false"
+     <a href="#" onclick="dodomark.toggle_home();return false"
         title="Home"><i class="fa fa-home"></i></a>
      <a href="https://github.com/noyesno/dodomark" target="_blank"
         title="DodoMark at GitHub"><i class="fa fa-github"></i></a>
     </nav>
   <div class="markedit-mark active">
-    <textarea id="markedit-mark" autocomplete="off"></textarea>
+<textarea id="markedit-mark" autocomplete="off">
+## Write Your Simple Self
+</textarea>
   </div>
   <div class="markedit-style">
     <textarea id="markedit-style">
@@ -153,8 +155,21 @@ header, footer {
   display:none;
 }
 
+article h1,
+article h2,
+article h3,
+article li,
+article blockquote,
+article td,
 article p {
   font-family: "Microsoft Yahei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+article code {
+    font-family:Consolas, "Courier New", monospace;
+}
+
+article p {
   font-size: 16px;
   color: #333;
   line-height:1.6;
@@ -213,7 +228,6 @@ article strong {
 
 
 article pre > code {
-    font-family: consolas, "Courier New", monospace;
     background-color: aliceblue;
     margin-left:1em;
     border:0;
@@ -223,7 +237,6 @@ article pre > code {
 }
 
 article code {
-    font-family:monospace, "Courier New";
     border:0;
     background-color:#f3f3f3;
     border-radius:0;
@@ -260,10 +273,10 @@ Markdown 是目前比较流行的一种文本写作格式。
 
 ## Inline Style
 
-一个不尽如人意的现实是用Markdown进行写作后，需要发布到比如微信这种平台时，
-简单的 Copy / Paste 不能保留文本的 Style 格式。
+一个不尽如人意的现实是用Markdown进行写作后，需要发布到比如微信订阅号这种平台时，
+简单的 Copy / Paste 不能保留文本的 CSS Style 格式。
 
-DodoMark 提供了 Inline Style 的方法来解决这个问题。
+DodoMark 提供了 Inline CSS Style 的方法来解决这个问题。
 
 </script>
 
@@ -299,106 +312,147 @@ Paragraph is separated by blank lines.
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 <script>
+
+function domready(callback, document){
+  document = document || window.document;
+  if(document.readyState === "interactive" || document.readyState=="complete"){
+    callback.call();
+  }else{
+    document.addEventListener("DOMContentLoaded", callback);
+  }
+}
+
+function docready(callback, document){
+  document = document || window.document;
+  if(document.readyState=="complete"){
+    callback.call();
+  }else{
+    document.defaultView.addEventListener("load", callback);
+  }
+}
+</script>
+
+<script>
+(function(){
+  var self = {};
+  window["dodomark"] = self;
+
   var markedit  = document.getElementById("markedit-mark");
   var markstyle = document.getElementById("markedit-style");
   var markpage  = document.getElementById("markpage");
+  var markdoc   = markpage.contentDocument;
 
-  function render_marktext(marktext, markcss){
-    if(!markcss){
-      markcss   = markstyle.value.trim();
-    }
-    if(!marktext){
-      marktext  = markedit.value.trim();
-    }
+  self.toggle_css = function(){
+    document.querySelector(".markedit-mark").classList.remove("active");
+    document.querySelector(".markedit-style").classList.add("active");
+  };
 
-    var markdoc = markpage.contentDocument;
+  self.toggle_markdown = function(){
+    document.querySelector(".markedit-mark").classList.add("active");
+    document.querySelector(".markedit-style").classList.remove("active");
+    this.render();
+  };
 
-    var header = markdoc.querySelector("nav");
-    if(!header){
-       var cssfont = document.getElementById("font-awesome");
-       var style = document.getElementById("markpage-style");
-       markdoc.head.appendChild(cssfont.cloneNode());
-       markdoc.head.appendChild(style);
-       style.type = "text/css";
-       
-       header = markdoc.createElement("nav")
-       markdoc.body.appendChild(header);
-  
-       var button_wechat = markdoc.createElement("a");
-       button_wechat.innerHTML = '<i class="fa fa-wechat"></i>';
-       button_wechat.title = "内嵌CSS样式以便于copy paste";
-       button_wechat.css = "wechat";
-       header.appendChild(button_wechat);
+  self.toggle_help = function(){
+    var marktext = document.getElementById("help-mark").text;
+    this.render(marktext);
+  };
 
-       button_wechat.addEventListener('click', function(){
-          wechat_article(markdoc, "#dodomark-article", "#dodomark-style");
-       });
-    }
-
-    var style = markdoc.createElement("style")
-    style.setAttribute("id", "dodomark-style");
-    var article = markdoc.createElement("article")
-    article.setAttribute("id", "dodomark-article");
-
-    style.textContent = markcss;
-    article.innerHTML = marked(marktext);
-
-    var s = markdoc.querySelector("style#dodomark-style");
-    if(s){
-       s.parentElement.removeChild(s);
-    }
-
-    var a = markdoc.querySelector("article#dodomark-article");
-    if(a){
-        a.parentElement.removeChild(a);
-    }
-
-    markdoc.head.appendChild(style);
-    markdoc.body.appendChild(article);
-
-    // markpage.srcdoc = "<head><style>"+markstyle+"</style>""<article>" + marked(marktext) + "</article>";
-  }
-
+  self.toggle_home = function(){
+    var marktext = document.getElementById("home-mark").text;
+    this.render(marktext);
+  };
 
   markedit.addEventListener('keyup', function(evt){
     // console.log("input", evt.key, evt.code, evt);
     if(evt.key=="Enter"){
-      render_marktext();
+      dodomark.render();
     }
   });
 
   markedit.addEventListener('change', function(){
     console.log("change", this);
-    render_marktext();
+    dodomark.render();
   });
 
-(function(){
-  markedit.value = document.getElementById("home-mark").text;
-  toggle_home();
-})();
+  self.render = function(marktext, markcss){
+      if(!markcss){
+	markcss   = markstyle.value.trim();
+      }
+      if(!marktext){
+	marktext  = markedit.value.trim();
+      }
 
-function toggle_css(){
-  document.querySelector(".markedit-mark").classList.remove("active");
-  document.querySelector(".markedit-style").classList.add("active");
-}
+      var markdoc = markpage.contentDocument;
 
-function toggle_markdown(){
-  document.querySelector(".markedit-mark").classList.add("active");
-  document.querySelector(".markedit-style").classList.remove("active");
-  render_marktext();
-}
 
-function toggle_help(){
-  var marktext = document.getElementById("help-mark").text;
-  render_marktext(marktext);
-}
+      var s = markdoc.querySelector("style#dodomark-style");
+      if(s){
+	 s.parentElement.removeChild(s);
+      }
 
-function toggle_home(){
-  var marktext = document.getElementById("home-mark").text;
-  render_marktext(marktext);
-}
+      var a = markdoc.querySelector("article#dodomark-article");
+      if(a){
+	  a.parentElement.removeChild(a);
+      }
 
+      var style = markdoc.createElement("style")
+      style.setAttribute("id", "dodomark-style");
+      var article = markdoc.createElement("article")
+      article.setAttribute("id", "dodomark-article");
+      var article_html = marked(marktext);
+
+      style.textContent = markcss;
+      article.innerHTML = article_html;
+
+      style.textContent = markcss;
+      markdoc.head.appendChild(style);
+      markdoc.body.appendChild(article);
+  };
+
+  docready(function(evt){
+      var header = markdoc.querySelector("nav");
+      console.log("header", header); 
+      if(!header){
+	 var cssfont = document.getElementById("font-awesome");
+	 var style = document.getElementById("markpage-style");
+	 markdoc.head.appendChild(cssfont.cloneNode());
+	 markdoc.head.appendChild(style);
+	 style.type = "text/css";
+	 
+	 header = markdoc.createElement("nav")
+	 markdoc.body.appendChild(header);
+    
+	 var button_wechat = markdoc.createElement("a");
+	 button_wechat.innerHTML = '<i class="fa fa-wechat"></i>';
+	 button_wechat.title = "内嵌CSS样式以便于copy paste";
+	 button_wechat.css = "wechat";
+	 header.appendChild(button_wechat);
+
+	 button_wechat.addEventListener('click', function(){
+	    wechat_article(markdoc, "#dodomark-article", "#dodomark-style");
+	 });
+      }
+  }, markdoc);
+}());
+</script>
+
+<script>
+
+domready(function(){
+  // console.log("domready");
+});
+
+docready(function(){
+  // console.log("docready");
+  dodomark.render( document.getElementById("home-mark").text );
+});
+
+</script>
+
+<script>
 function inline_cssrules(el, sheets) {
     sheets = sheets || document.styleSheets;
     var ret = [];
