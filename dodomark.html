@@ -55,7 +55,7 @@ body > main {
 #markedit-mark,
 #markedit-style {
   flex:1 1;
-  padding:3rem 2rem;
+  padding:4rem 2rem;
   resize: none;
   background-color:#333;
   color:wheat;
@@ -314,7 +314,6 @@ Paragraph is separated by blank lines.
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <script>
-
 function domready(callback, document){
   document = document || window.document;
   if(document.readyState === "interactive" || document.readyState=="complete"){
@@ -336,7 +335,8 @@ function docready(callback, document){
 
 <script>
 (function(){
-  var self = {};
+  var self    = {};
+  var private = {};
   window["dodomark"] = self;
 
   var markedit  = document.getElementById("markedit-mark");
@@ -377,6 +377,31 @@ function docready(callback, document){
     dodomark.render();
   });
 
+  private.initdoc = function(markdoc){
+      var header = markdoc.querySelector("nav");
+      console.log("header", header); 
+      if(!header){
+	 var cssfont = document.getElementById("font-awesome");
+	 var style = document.getElementById("markpage-style");
+	 markdoc.head.appendChild(cssfont.cloneNode());
+	 markdoc.head.appendChild(style);
+	 style.type = "text/css";
+	 
+	 header = markdoc.createElement("nav")
+	 markdoc.body.appendChild(header);
+    
+	 var button_wechat = markdoc.createElement("a");
+	 button_wechat.innerHTML = '<i class="fa fa-wechat"></i>';
+	 button_wechat.title = "内嵌CSS样式以便于copy paste";
+	 button_wechat.css = "wechat";
+	 header.appendChild(button_wechat);
+
+	 button_wechat.addEventListener('click', function(){
+	    wechat_article(markdoc, "#dodomark-article", "#dodomark-style");
+	 });
+      }
+  };
+
   self.render = function(marktext, markcss){
       if(!markcss){
 	markcss   = markstyle.value.trim();
@@ -386,6 +411,8 @@ function docready(callback, document){
       }
 
       var markdoc = markpage.contentDocument;
+
+      private.initdoc(markdoc);
 
 
       var s = markdoc.querySelector("style#dodomark-style");
@@ -412,30 +439,6 @@ function docready(callback, document){
       markdoc.body.appendChild(article);
   };
 
-  docready(function(evt){
-      var header = markdoc.querySelector("nav");
-      console.log("header", header); 
-      if(!header){
-	 var cssfont = document.getElementById("font-awesome");
-	 var style = document.getElementById("markpage-style");
-	 markdoc.head.appendChild(cssfont.cloneNode());
-	 markdoc.head.appendChild(style);
-	 style.type = "text/css";
-	 
-	 header = markdoc.createElement("nav")
-	 markdoc.body.appendChild(header);
-    
-	 var button_wechat = markdoc.createElement("a");
-	 button_wechat.innerHTML = '<i class="fa fa-wechat"></i>';
-	 button_wechat.title = "内嵌CSS样式以便于copy paste";
-	 button_wechat.css = "wechat";
-	 header.appendChild(button_wechat);
-
-	 button_wechat.addEventListener('click', function(){
-	    wechat_article(markdoc, "#dodomark-article", "#dodomark-style");
-	 });
-      }
-  }, markdoc);
 }());
 </script>
 
