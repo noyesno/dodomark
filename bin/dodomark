@@ -1,0 +1,51 @@
+#!/usr/bin/env tclsh
+# vim:set syntax=tcl: #
+
+package require Markdown
+
+proc render {markdown_file html_file} {
+  set html_file [file root $html_file].html
+
+  set fp [open $markdown_file]
+  set markdown_text [read $fp]
+  close $fp
+
+  set html_text [::Markdown::convert $markdown_text]
+  set fout [open $html_file "w"]
+  puts $fout $html_text
+  close $fout
+}
+
+
+proc main-find {srcdir dstdir} {
+  set srcdir [string trimright $srcdir "/"]
+  set dstdir [string trimright $dstdir "/"]
+  foreach srcfile [exec find $srcdir -name *.md -printf "%P\n"] {
+     set dstfile [file join $dstdir $srcfile]
+     set dstfile [file root $dstfile].html
+     render $srcdir/$srcfile $dstfile
+  } 
+}
+
+proc main-update {srcdir dstdir srcfile_list} {
+  foreach srcfile $srcfile_list {
+    set dstfile [file join $dstdir $srcfile]
+    render $srcfile $dstfile 
+  }
+}
+
+proc main-render {srcfile dstfile} {
+  puts "... render $srcfile => $dstfile"
+  markdown2html $srcfile $dstfile
+}
+
+
+set ::argv [lassign $::argv srcdir dstdir]
+set ::argc [llength $::argv]
+
+if {$argc==0} {
+   main-find $srcdir $dstdir
+} else {
+   main-update $srcdir $dstdir $::argv
+}
+
